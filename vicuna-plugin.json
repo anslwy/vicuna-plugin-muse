@@ -1,15 +1,43 @@
 {
   "id": "muse",
   "name": "Muse Harness",
-  "version": "1.0.0",
-  "description": "Adds the Muse coding agent as a Work harness, driven over ACP (`muse acp`).",
+  "version": "1.1.0",
+  "description": "Adds the Muse coding agent as a Work harness, driven over ACP (`muse acp`), with its subscription allowance in Vicuna's Usage view (`muse usage --json`).",
   "harnesses": [
     {
       "id": "muse",
       "label": "Muse",
-      "acp": { "command": "muse", "args": ["acp"] },
+      "acp": {
+        "command": "muse",
+        "args": [
+          "acp"
+        ]
+      },
       "installHint": "Install the muse CLI, run `muse login` once, then reopen Work.",
-      "installUrl": "https://github.com/anslwy/vicuna-plugin-muse#install-the-cli"
+      "installUrl": "https://github.com/anslwy/vicuna-plugin-muse#install-the-cli",
+      "usage": {
+        "command": "muse",
+        "args": [
+          "usage",
+          "--json"
+        ],
+        "map": {
+          "plan": "/allowance/tier",
+          "note": "/hint",
+          "meters": [
+            {
+              "label": "Session",
+              "usedPercent": "/allowance/window/usedPercent",
+              "resetsAt": "/allowance/window/resetsAtMs"
+            },
+            {
+              "label": "Weekly",
+              "usedPercent": "/allowance/weekly/usedPercent",
+              "resetsAt": "/allowance/weekly/resetsAtMs"
+            }
+          ]
+        }
+      }
     }
   ]
 }

@@ -8,8 +8,9 @@ the same way it drives its built-in ACP harnesses (OpenCode, Antigravity, fx).
 
 1. Install the CLI. See "Install the CLI" below.
 2. In Vicuna: **Settings → Plugins → Explore → Muse Harness → Install** (or paste `anslwy/vicuna-plugin-muse`).
-3. Vicuna shows exactly which command the harness will run (`muse acp`). Click **Allow and enable**.
+3. Vicuna shows exactly which commands the harness will run (`muse acp`, and `muse usage --json` for the Usage view). Click **Allow and enable**.
 4. Pick **Muse** in the Work harness picker. Models come from the agent itself.
+5. The Work header's usage meter (and the agents' `usage_status` tool) now has a **Muse** tab with your session and weekly allowance.
 
 ### Install the CLI
 
@@ -33,7 +34,19 @@ Any CLI that serves ACP over stdio can become a harness. A plugin is just a `vic
       "acp": { "command": "my-agent", "args": ["acp"] },
       "models": [{ "id": "fast-1", "label": "Fast" }],
       "installHint": "Install my-agent and sign in once.",
-      "installUrl": "https://example.com/install"
+      "installUrl": "https://example.com/install",
+      "usage": {
+        "command": "my-agent",
+        "args": ["usage", "--json"],
+        "map": {
+          "plan": "/plan",
+          "note": "/message",
+          "meters": [
+            { "label": "Weekly", "usedPercent": "/weekly/used_percent", "resetsAt": "/weekly/resets_at" },
+            { "each": "/models", "labelPath": "/name", "group": "Models", "used": "/requests", "limit": "/max_requests" }
+          ]
+        }
+      }
     }
   ]
 }
@@ -50,12 +63,32 @@ Any CLI that serves ACP over stdio can become a harness. A plugin is just a `vic
 
 A plugin can declare up to 4 harnesses.
 
+### Usage (optional)
+
+`usage` lets Vicuna show the harness's subscription allowance in its Usage view and in the agents' `usage_status`
+tool, like the built-in Claude Code / Codex / Antigravity tabs. Vicuna runs `usage.command` + `usage.args` (same
+rules as `acp`: a bare program on PATH, args list, no shell), reads at most 256 KB of stdout, stops it after 15 s,
+and parses it as **JSON only**. No plugin code runs: the `map` says where the numbers are, as
+[JSON pointers](https://www.rfc-editor.org/rfc/rfc6901) (`/a/b/0`).
+
+| Field | Rules |
+|---|---|
+| `map.plan` / `map.note` | Optional pointers to a plan name and a short note (the note explains an empty result). |
+| `map.meters` | 1–16 meters. Each needs `label` (fixed text) or `labelPath`, and **exactly one** of `usedPercent`, `remainingPercent`, or `used` + `limit`. |
+| `resetsAt` | Optional. An ISO 8601 string or an epoch number (seconds, or milliseconds; Vicuna tells them apart by size). |
+| `group` | Optional title; meters with the same group are shown together. |
+| `each` | Optional pointer to an array: the meter repeats for every element, and its other pointers are relative to that element. |
+
+Percentages and counts may be numbers or numeric strings. A meter whose value is missing is skipped. If no meter
+has a value, the tab says the usage is unknown (with `note` as the reason when there is one). Never put account
+emails or identifiers in the mapped fields: they would reach the Usage view. Vicuna never passes the account to agents.
+
 ### Consent
 
-A harness stays **disabled** until the user approves the exact command and args in a dialog. Vicuna also tells
+A harness stays **disabled** until the user approves the exact command and args (and the usage command, if any) in a dialog. Vicuna also tells
 the user that the agent works in the session's workspace with the same powers as the built-in harnesses.
 Consent is stored on the Vicuna server next to the plugin's `install.json`, and the server checks it every time it
-starts the agent. If an upgrade changes `command` or `args`, the harness is disabled again until the user approves
+starts the agent. If an upgrade changes `command`, `args` or the usage command, the harness is disabled again until the user approves
 the new command. Uninstalling the plugin removes the harness, and sessions that used it show a message asking you
 to pick another harness.
 
