@@ -1,0 +1,15 @@
+{
+  "id": "muse",
+  "name": "Muse Harness",
+  "version": "1.0.0",
+  "description": "Adds the Muse coding agent as a Work harness, driven over ACP (`muse acp`).",
+  "harnesses": [
+    {
+      "id": "muse",
+      "label": "Muse",
+      "acp": { "command": "muse", "args": ["acp"] },
+      "installHint": "Install the muse CLI, run `muse login` once, then reopen Work.",
+      "installUrl": "https://github.com/anslwy/vicuna-plugin-muse#install-the-cli"
+    }
+  ]
+}
