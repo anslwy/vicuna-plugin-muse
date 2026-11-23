@@ -12,6 +12,18 @@ the same way it drives its built-in ACP harnesses (OpenCode, Antigravity, fx).
 4. Pick **Muse** in the Work harness picker. Models come from the agent itself.
 5. The Work header's usage meter (and the agents' `usage_status` tool) now has a **Muse** tab with your session and weekly allowance.
 
+### Use multiple accounts
+
+With Vicuna **0.0.75** or later, open the Work model picker, then open the
+harness list and click **+** beside Muse. Name the account and run the sign-in
+command Vicuna shows in a terminal on the machine running the harness. Click
+**I've signed in** to select it. Choose **Default** to return to your regular
+Muse login. The Muse tab in **Usage** has a chip for each account.
+
+Vicuna keeps each named account's Muse credentials and session data in
+separate directories. Removing an account from the picker leaves those
+directories on disk. Earlier Vicuna versions can use the default Muse login.
+
 ### Install the CLI
 
 This plugin does **not** ship any program. You install `muse` yourself, sign in once with `muse login`,

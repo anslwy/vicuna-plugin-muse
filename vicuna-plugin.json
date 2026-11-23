@@ -1,7 +1,7 @@
 {
   "id": "muse",
   "name": "Muse Harness",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Adds the Muse coding agent as a Work harness, driven over ACP (`muse acp`), with its subscription allowance in Vicuna's Usage view (`muse usage --json`).",
   "harnesses": [
     {
@@ -38,7 +38,8 @@
           ]
         }
       },
-      "icon": "muse.svg"
+      "icon": "muse.svg",
+      "accounts": "muse"
     }
   ]
 }
